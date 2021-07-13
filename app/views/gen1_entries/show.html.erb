@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Playername:</strong>
+  <%= @gen1_entry.playerName %>
+</p>
+
+<p>
+  <strong>Savefile:</strong>
+  <%= link_to @gen1_entry.saveFile.filename, @gen1_entry.saveFile if @gen1_entry.saveFile.attached? %>
+</p>
+
+<%= link_to 'Edit', edit_gen1_entry_path(@gen1_entry) %> |
+<%= link_to 'Back', gen1_entries_path %>
