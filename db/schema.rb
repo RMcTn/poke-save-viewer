@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_13_225955) do
+ActiveRecord::Schema.define(version: 2021_07_14_215924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,34 @@ ActiveRecord::Schema.define(version: 2021_07_13_225955) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "parties", force: :cascade do |t|
+    t.bigint "gen1_entry_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["gen1_entry_id"], name: "index_parties_on_gen1_entry_id"
+  end
+
+  create_table "pokemons", force: :cascade do |t|
+    t.integer "pokemon_id"
+    t.integer "current_hp"
+    t.integer "status_condition"
+    t.integer "type1"
+    t.integer "type2"
+    t.integer "move1_id"
+    t.integer "move2_id"
+    t.integer "move3_id"
+    t.integer "move4_id"
+    t.integer "max_hp"
+    t.integer "level"
+    t.string "nickname"
+    t.bigint "party_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["party_id"], name: "index_pokemons_on_party_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "parties", "gen1_entries"
+  add_foreign_key "pokemons", "parties"
 end
