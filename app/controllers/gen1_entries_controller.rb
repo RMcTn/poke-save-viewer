@@ -18,6 +18,12 @@ class Gen1EntriesController < ApplicationController
     return translatedString
   end
 
+  def get_player_name(save_file)
+    player_name_offset = 0x2598
+    player_name_max_size = 0xB
+    save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
+  end
+
   def get_player_party(save_file)
     # See https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I) for offsets
     party_pokemon = []
@@ -82,9 +88,7 @@ class Gen1EntriesController < ApplicationController
       @mappings[poke_char] = splits[0]
     end
     uploaded_file = File.binread(params[:gen1_entry][:saveFile])
-    player_name_offset = 0x2598
-    player_name_max_size = 0xB
-    player_name = translateGameString(uploaded_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes, @mappings)
+    player_name = translateGameString(get_player_name(uploaded_file), @mappings)
     @gen1_entry.playerName = player_name
 
     party_pokemon = get_player_party(uploaded_file.bytes)
