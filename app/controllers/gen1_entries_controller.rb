@@ -3,19 +3,16 @@ class Gen1EntriesController < ApplicationController
 
   PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1, :type2, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname)
 
-  def translateGameString(gameStr, characterMapping)
-    translatedString = ""
+  def translate_game_string(game_str, character_mapping)
+    translated_string = ""
     terminating_character = 0x50
-    gameStr.each do |byte|
-      if byte == '0' or byte == terminating_character
-        return translatedString
-      end
-      mappedCharacter = characterMapping[byte]
-      if !mappedCharacter.nil?
-        translatedString += mappedCharacter
-      end
+    game_str.each do |byte|
+      return translated_string if (byte == '0') || (byte == terminating_character)
+
+      mapped_character = character_mapping[byte]
+      translated_string += mapped_character unless mapped_character.nil?
     end
-    return translatedString
+    translated_string
   end
 
   def get_player_name(save_file)
@@ -48,7 +45,7 @@ class Gen1EntriesController < ApplicationController
       max_hp = save_file[pokemon_offset + 0x22] + save_file[pokemon_offset + 0x23]
       nickname_offset = nicknames_offset + (i * max_nickname_size)
       nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
-      nickname = translateGameString(nickname, @mappings)
+      nickname = translate_game_string(nickname, @mappings)
 
       pokemon = PokemonStruct.new(pokemon_id, current_hp, status_condition, type1, type2, move1_id, move2_id, move3_id, move4_id, max_hp, level, nickname)
       party_pokemon.push(pokemon)
@@ -88,7 +85,7 @@ class Gen1EntriesController < ApplicationController
       @mappings[poke_char] = splits[0]
     end
     uploaded_file = File.binread(params[:gen1_entry][:saveFile])
-    player_name = translateGameString(get_player_name(uploaded_file), @mappings)
+    player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
     @gen1_entry.playerName = player_name
 
     party_pokemon = get_player_party(uploaded_file.bytes)
