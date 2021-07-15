@@ -55,6 +55,21 @@ class Gen1EntriesController < ApplicationController
     party_pokemon
   end
 
+  def get_badges_obtained(save_file)
+    gym_badges_offset = 0x29D6
+    # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
+    badges_bit_field = save_file[gym_badges_offset]
+    obtained_badges = []
+    obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
+    obtained_badges.push("Cascade") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Thunder") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Rainbow") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Soul") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Marsh") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Volcano") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
+  end
+
   # GET /gen1_entries or /gen1_entries.json
   def index
     @gen1_entries = Gen1Entry.all
@@ -96,8 +111,10 @@ class Gen1EntriesController < ApplicationController
 
     end
 
-    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played
-    # Might need a pokemon model?
+    obtained_badges = get_badges_obtained(uploaded_file.bytes)
+    @gen1_entry.badges = obtained_badges
+
+    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, elite 4, hall of fame
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
     respond_to do |format|
