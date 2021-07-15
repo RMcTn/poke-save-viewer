@@ -6,6 +6,11 @@
 </p>
 
 <p>
+  <strong>Playtime:</strong>
+  <%= Time.at(@gen1_entry.playtime).utc.strftime "%H:%M:%S" %>
+</p>
+
+<p>
   <strong>Savefile:</strong>
   <%= link_to @gen1_entry.saveFile.filename, @gen1_entry.saveFile if @gen1_entry.saveFile.attached? %>
 <p>

@@ -70,6 +70,14 @@ class Gen1EntriesController < ApplicationController
     obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
   end
 
+  def get_playtime_in_seconds(save_file)
+    playtime_offset = 0x2CED
+    playtime_hours = save_file[playtime_offset]
+    playtime_minutes = save_file[playtime_offset + 2]
+    playtime_seconds = save_file[playtime_offset + 3]
+    (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
+  end
+
   # GET /gen1_entries or /gen1_entries.json
   def index
     @gen1_entries = Gen1Entry.all
@@ -113,6 +121,9 @@ class Gen1EntriesController < ApplicationController
 
     obtained_badges = get_badges_obtained(uploaded_file.bytes)
     @gen1_entry.badges = obtained_badges
+
+    playtime = get_playtime_in_seconds(uploaded_file.bytes)
+    @gen1_entry.playtime = playtime
 
     # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, elite 4, hall of fame
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
