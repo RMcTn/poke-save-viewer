@@ -1,7 +1,7 @@
 class Gen1EntriesController < ApplicationController
   before_action :set_gen1_entry, only: %i[ show edit update destroy ]
 
-  PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1, :type2, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname)
+  PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1, :type2, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
   def translate_game_string(game_str, character_mapping)
     translated_string = ""
@@ -47,7 +47,7 @@ class Gen1EntriesController < ApplicationController
       nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
       nickname = translate_game_string(nickname, @mappings)
 
-      pokemon = PokemonStruct.new(pokemon_id, current_hp, status_condition, type1, type2, move1_id, move2_id, move3_id, move4_id, max_hp, level, nickname)
+      pokemon = PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1: type1, type2: type2, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, max_hp: max_hp, level: level, nickname: nickname)
       party_pokemon.push(pokemon)
       pokemon_offset += pokemon_size
     end
@@ -76,6 +76,37 @@ class Gen1EntriesController < ApplicationController
     playtime_minutes = save_file[playtime_offset + 2]
     playtime_seconds = save_file[playtime_offset + 3]
     (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
+  end
+
+  def get_hall_of_fame_entries(save_file)
+    hall_of_fame_offset = 0x0598
+    max_hall_of_fame_record_count = 50
+    pokemon_size = 16
+    max_pokemon_per_record = 6
+    hall_of_fame_entries = []
+    max_nickname_size = 0xB # TODO: This is defined in multiple places, refactor
+    pokemon_padding_size = 0x3
+    (0..max_hall_of_fame_record_count).each do |i|
+      current_offset = hall_of_fame_offset + (pokemon_size * 6 * i)
+      # Padding seems to only exist if there is a pokemon in the hall of fame entry. We break if there is no padding (no hall of fame entry)
+      has_padding = save_file[current_offset + 1 + max_nickname_size + 1..current_offset + 1 + max_nickname_size + pokemon_padding_size].sum.zero?
+      break unless has_padding
+
+      hall_of_fame_entries.push([])
+      (0..max_pokemon_per_record - 1).each do |j|
+        pokemon_offset = current_offset + (j * pokemon_size)
+        pokemon_id = save_file[pokemon_offset]
+        next if pokemon_id.zero? || pokemon_id == 0xFF
+
+        level = save_file[pokemon_offset + 1]
+        nickname = save_file[pokemon_offset + 2..pokemon_offset + 2 + max_nickname_size]
+        nickname = translate_game_string(nickname, @mappings)
+        pokemon = PokemonStruct.new(pokemon_id: pokemon_id, level: level, nickname: nickname)
+        pokemons = hall_of_fame_entries[i]
+        pokemons.push(pokemon)
+      end
+    end
+    hall_of_fame_entries
   end
 
   # GET /gen1_entries or /gen1_entries.json
@@ -107,6 +138,7 @@ class Gen1EntriesController < ApplicationController
       poke_char = splits[1].to_i(16)
       @mappings[poke_char] = splits[0]
     end
+
     uploaded_file = File.binread(params[:gen1_entry][:saveFile])
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
     @gen1_entry.playerName = player_name
@@ -116,7 +148,6 @@ class Gen1EntriesController < ApplicationController
     party_pokemon.each do |pokemon|
       created_pokemon = Pokemon.create(party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1, type2: pokemon.type2, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
       party.pokemons.push(created_pokemon)
-
     end
 
     obtained_badges = get_badges_obtained(uploaded_file.bytes)
@@ -125,7 +156,16 @@ class Gen1EntriesController < ApplicationController
     playtime = get_playtime_in_seconds(uploaded_file.bytes)
     @gen1_entry.playtime = playtime
 
-    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, elite 4, hall of fame
+    hall_of_fame_entries = get_hall_of_fame_entries(uploaded_file.bytes)
+    hall_of_fame_entries.each do |entry|
+      hall_of_fame_entry = Gen1HallOfFameEntry.create(gen1_entry: @gen1_entry)
+      entry.each do |pokemon|
+        created_pokemon = Gen1HallOfFamePokemon.create(pokemon_id: pokemon.pokemon_id, level: pokemon.level, nickname: pokemon.nickname)
+        hall_of_fame_entry.gen1_hall_of_fame_pokemons.push(created_pokemon)
+      end
+    end
+
+    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, hall of fame
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
     respond_to do |format|
