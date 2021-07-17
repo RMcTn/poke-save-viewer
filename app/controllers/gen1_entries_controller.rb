@@ -31,8 +31,12 @@ class Gen1EntriesController < ApplicationController
     nicknames_offset = party_offset + 0x152
     max_nickname_size = 0xB
 
+    # TODO: duplicated array, move this somewhere else
+    # Pokemon index is different to pokemon id, see https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_index_number_(Generation_I)
+    @pokemon_indexes_to_id_arr = [112, 115, 32, 35, 21, 100, 34, 80, 2, 103, 108, 102, 88, 94, 29, 31, 104, 111, 131, 59, 151, 130, 90, 72, 92, 123, 120, 9, 127, 114, -1, -1, 58, 95, 22, 16, 79, 64, 75, 113, 67, 122, 106, 107, 24, 47, 54, 96, 76, -1, 126, -1, 125, 82, 109, -1, 56, 86, 50, 128, -1, -1, -1, 83, 48, 149, -1, -1, -1, 84, 60, 124, 146, 144, 145, 132, 52, 98, -1, -1, -1, 37, 38, 25, 26, -1, -1, 147, 148, 140, 141, 116, 117, -1, -1, 27, 28, 138, 139, 39, 40, 133, 136, 135, 134, 66, 41, 23, 46, 61, 62, 13, 14, 15, -1, 85, 57, 51, 49, 87, -1, -1, 10, 11, 12, 68, -1, 55, 97, 42, 150, 143, 129, -1, -1, 89, -1, 99, 91, -1, 101, 36, 110, 53, 105, -1, 93, 63, 65, 17, 18, 121, 1, 3, 73, -1, 118, 119, -1, -1, -1, -1, 77, 78, 19, 20, 33, 30, 74, 137, 142, -1, 81, -1, -1, 4, 7, 5, 8, 6, -1, -1, -1, -1, 43, 44, 45, 69, 70, 71]
     (0..party_size - 1).each do |i|
-      pokemon_id = save_file[pokemon_offset]
+      pokemon_index = save_file[pokemon_offset]
+      pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
       current_hp = save_file[pokemon_offset + 1] + save_file[pokemon_offset + 2]
       status_condition = save_file[pokemon_offset + 4]
       type1 = save_file[pokemon_offset + 5]
@@ -86,6 +90,8 @@ class Gen1EntriesController < ApplicationController
     hall_of_fame_entries = []
     max_nickname_size = 0xB # TODO: This is defined in multiple places, refactor
     pokemon_padding_size = 0x3
+
+    @pokemon_indexes_to_id_arr = [112, 115, 32, 35, 21, 100, 34, 80, 2, 103, 108, 102, 88, 94, 29, 31, 104, 111, 131, 59, 151, 130, 90, 72, 92, 123, 120, 9, 127, 114, -1, -1, 58, 95, 22, 16, 79, 64, 75, 113, 67, 122, 106, 107, 24, 47, 54, 96, 76, -1, 126, -1, 125, 82, 109, -1, 56, 86, 50, 128, -1, -1, -1, 83, 48, 149, -1, -1, -1, 84, 60, 124, 146, 144, 145, 132, 52, 98, -1, -1, -1, 37, 38, 25, 26, -1, -1, 147, 148, 140, 141, 116, 117, -1, -1, 27, 28, 138, 139, 39, 40, 133, 136, 135, 134, 66, 41, 23, 46, 61, 62, 13, 14, 15, -1, 85, 57, 51, 49, 87, -1, -1, 10, 11, 12, 68, -1, 55, 97, 42, 150, 143, 129, -1, -1, 89, -1, 99, 91, -1, 101, 36, 110, 53, 105, -1, 93, 63, 65, 17, 18, 121, 1, 3, 73, -1, 118, 119, -1, -1, -1, -1, 77, 78, 19, 20, 33, 30, 74, 137, 142, -1, 81, -1, -1, 4, 7, 5, 8, 6, -1, -1, -1, -1, 43, 44, 45, 69, 70, 71]
     (0..max_hall_of_fame_record_count).each do |i|
       current_offset = hall_of_fame_offset + (pokemon_size * 6 * i)
       # Padding seems to only exist if there is a pokemon in the hall of fame entry. We break if there is no padding (no hall of fame entry)
@@ -95,8 +101,9 @@ class Gen1EntriesController < ApplicationController
       hall_of_fame_entries.push([])
       (0..max_pokemon_per_record - 1).each do |j|
         pokemon_offset = current_offset + (j * pokemon_size)
-        pokemon_id = save_file[pokemon_offset]
-        next if pokemon_id.zero? || pokemon_id == 0xFF
+        pokemon_index = save_file[pokemon_offset]
+        next if pokemon_index.zero? || pokemon_index == 0xFF
+        pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
 
         level = save_file[pokemon_offset + 1]
         nickname = save_file[pokemon_offset + 2..pokemon_offset + 2 + max_nickname_size]
@@ -168,6 +175,10 @@ class Gen1EntriesController < ApplicationController
     # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, hall of fame
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
+    #
+    # TODO: Add indicator on the save list if there is a hall of fame record or not
+    #
+    # TODO: On cascade delete things for pokemon + party + gen1 hall of fame etc
     respond_to do |format|
       if @gen1_entry.save
         format.html { redirect_to @gen1_entry, notice: "Gen1 entry was successfully created." }
