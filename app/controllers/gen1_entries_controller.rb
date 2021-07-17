@@ -37,7 +37,7 @@ class Gen1EntriesController < ApplicationController
     (0..party_size - 1).each do |i|
       pokemon_index = save_file[pokemon_offset]
       pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
-      current_hp = save_file[pokemon_offset + 1] + save_file[pokemon_offset + 2]
+      current_hp = (save_file[pokemon_offset + 1] << 8) + save_file[pokemon_offset + 2]
       status_condition = save_file[pokemon_offset + 4]
       type1 = save_file[pokemon_offset + 5]
       type2 = save_file[pokemon_offset + 6]
@@ -46,7 +46,7 @@ class Gen1EntriesController < ApplicationController
       move3_id = save_file[pokemon_offset + 0xA]
       move4_id = save_file[pokemon_offset + 0xB]
       level = save_file[pokemon_offset + 0x21]
-      max_hp = save_file[pokemon_offset + 0x22] + save_file[pokemon_offset + 0x23]
+      max_hp = (save_file[pokemon_offset + 0x22] << 8) + save_file[pokemon_offset + 0x23]
       nickname_offset = nicknames_offset + (i * max_nickname_size)
       nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
       nickname = translate_game_string(nickname, @mappings)
