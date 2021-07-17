@@ -1,9 +1,12 @@
 <div class="pokemon">
+  <img class="pokemon-sprite" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= pokemon.pokemon_id %>.png"/>
   <ul>
+    <li>pokemon id: <%= pokemon.pokemon_id %></li>
     <li>nickname: <%= pokemon.nickname %></li>
     <li>level: <%= pokemon.level %></li>
     <li>max_hp: <%= pokemon.max_hp %></li>
     <li>current_hp: <%= pokemon.current_hp %></li>
+    <li><%= pokemon.current_hp %>/<%= pokemon.max_hp %> HP</li>
     <li>type1: <%= pokemon.type1 %></li>
     <li>type2: <%= pokemon.type2 %></li>
   </ul>
