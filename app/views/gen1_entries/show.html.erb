@@ -7,16 +7,19 @@
 
 <p>
   <strong>Playtime:</strong>
-  <%= Time.at(@gen1_entry.playtime).utc.strftime "%H:%M:%S" %>
+  <% minutes, seconds = @gen1_entry.playtime.divmod(60) %>
+  <% hours, minutes = minutes.divmod(60) %>
+  <%= "#{hours.to_s.rjust(2, '0')}:#{minutes.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}" %>
 </p>
 
 <p>
   <strong>Savefile:</strong>
   <%= link_to @gen1_entry.saveFile.filename, @gen1_entry.saveFile if @gen1_entry.saveFile.attached? %>
+</p>
+
 <p>
   <strong>Badges:</strong>
   <%= @gen1_entry.badges %>
-</p>
 </p>
 
 <p>
