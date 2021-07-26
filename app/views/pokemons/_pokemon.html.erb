@@ -7,6 +7,9 @@
     <li>max_hp: <%= pokemon.max_hp %></li>
     <li>current_hp: <%= pokemon.current_hp %></li>
     <li><%= pokemon.current_hp %>/<%= pokemon.max_hp %> HP</li>
+    <% pokemon_types = { 0 => "Normal", 1 => "Fighting", 2 => "Flying", 3 => "Poison", 4 => "Ground", 5 => "Rock", 7 => "Bug", 8 => "Ghost", 20 => "Fire", 21 => "Water", 22 => "Grass", 23 => "Electric", 24 => "Psychic", 25 => "Ice", 26 => "Dragon" } %>
+    <li>type1: <%= pokemon_types[pokemon.type1] %></li>
+    <li>type2: <%= pokemon_types[pokemon.type2] %></li>
     <li>type1: <%= pokemon.type1 %></li>
     <li>type2: <%= pokemon.type2 %></li>
   </ul>

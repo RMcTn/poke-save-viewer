@@ -1,7 +1,7 @@
 class Gen1EntriesController < ApplicationController
   before_action :set_gen1_entry, only: %i[ show edit update destroy ]
 
-  PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1, :type2, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
+  PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
   def translate_game_string(game_str, character_mapping)
     translated_string = ""
@@ -39,8 +39,8 @@ class Gen1EntriesController < ApplicationController
       pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
       current_hp = (save_file[pokemon_offset + 1] << 8) + save_file[pokemon_offset + 2]
       status_condition = save_file[pokemon_offset + 4]
-      type1 = save_file[pokemon_offset + 5]
-      type2 = save_file[pokemon_offset + 6]
+      type1_id = save_file[pokemon_offset + 5]
+      type2_id = save_file[pokemon_offset + 6]
       move1_id = save_file[pokemon_offset + 8]
       move2_id = save_file[pokemon_offset + 9]
       move3_id = save_file[pokemon_offset + 0xA]
@@ -51,7 +51,7 @@ class Gen1EntriesController < ApplicationController
       nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
       nickname = translate_game_string(nickname, @mappings)
 
-      pokemon = PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1: type1, type2: type2, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, max_hp: max_hp, level: level, nickname: nickname)
+      pokemon = PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1_id: type1_id, type2_id: type2_id, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, max_hp: max_hp, level: level, nickname: nickname)
       party_pokemon.push(pokemon)
       pokemon_offset += pokemon_size
     end
@@ -132,6 +132,7 @@ class Gen1EntriesController < ApplicationController
 
   # GET /gen1_entries/1/edit
   def edit
+    # TODO: Either disable edit or rerun create logic on an edit (since it's just uploading a file again)
   end
 
   # POST /gen1_entries or /gen1_entries.json
@@ -153,7 +154,8 @@ class Gen1EntriesController < ApplicationController
     party_pokemon = get_player_party(uploaded_file.bytes)
     party = Party.create(gen1_entry: @gen1_entry)
     party_pokemon.each do |pokemon|
-      created_pokemon = Pokemon.create(party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1, type2: pokemon.type2, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
+      # TODO: Change type column to type_id
+      created_pokemon = Pokemon.create(party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
       party.pokemons.push(created_pokemon)
     end
 
@@ -176,9 +178,10 @@ class Gen1EntriesController < ApplicationController
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
     #
-    # TODO: Add indicator on the save list if there is a hall of fame record or not
-    #
     # TODO: On cascade delete things for pokemon + party + gen1 hall of fame etc
+
+    # TODO: Can't get what game it is from the savefile, will need to have user input (dropdown?)
+    # TODO: pokemon red and blue are identical, so only pokemon red/blue then yellow need to be pickable values
     respond_to do |format|
       if @gen1_entry.save
         format.html { redirect_to @gen1_entry, notice: "Gen1 entry was successfully created." }
