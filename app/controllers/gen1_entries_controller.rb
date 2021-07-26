@@ -21,6 +21,32 @@ class Gen1EntriesController < ApplicationController
     save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
   end
 
+  def get_pokemon_from_save(save_file, pokemon_offset, nickname_offset, is_party_pokemon)
+    pokemon_index = save_file[pokemon_offset]
+    pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
+    current_hp = (save_file[pokemon_offset + 1] << 8) + save_file[pokemon_offset + 2]
+    status_condition = save_file[pokemon_offset + 4]
+    type1_id = save_file[pokemon_offset + 5]
+    type2_id = save_file[pokemon_offset + 6]
+    move1_id = save_file[pokemon_offset + 8]
+    move2_id = save_file[pokemon_offset + 9]
+    move3_id = save_file[pokemon_offset + 0xA]
+    move4_id = save_file[pokemon_offset + 0xB]
+    # nickname_offset = nicknames_offset + (i * max_nickname_size)
+    max_nickname_size = 0xB
+    nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
+    nickname = translate_game_string(nickname, @mappings)
+    unless is_party_pokemon
+      return PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1_id: type1_id, type2_id: type2_id, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, nickname: nickname)
+
+    end
+
+    level = save_file[pokemon_offset + 0x21]
+    max_hp = (save_file[pokemon_offset + 0x22] << 8) + save_file[pokemon_offset + 0x23]
+    pokemon = PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1_id: type1_id, type2_id: type2_id, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, max_hp: max_hp, level: level, nickname: nickname)
+
+  end
+
   def get_player_party(save_file)
     # See https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I) for offsets
     party_pokemon = []
@@ -30,28 +56,12 @@ class Gen1EntriesController < ApplicationController
     pokemon_offset = party_offset + 8
     nicknames_offset = party_offset + 0x152
     max_nickname_size = 0xB
-
     # TODO: duplicated array, move this somewhere else
     # Pokemon index is different to pokemon id, see https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_index_number_(Generation_I)
     @pokemon_indexes_to_id_arr = [112, 115, 32, 35, 21, 100, 34, 80, 2, 103, 108, 102, 88, 94, 29, 31, 104, 111, 131, 59, 151, 130, 90, 72, 92, 123, 120, 9, 127, 114, -1, -1, 58, 95, 22, 16, 79, 64, 75, 113, 67, 122, 106, 107, 24, 47, 54, 96, 76, -1, 126, -1, 125, 82, 109, -1, 56, 86, 50, 128, -1, -1, -1, 83, 48, 149, -1, -1, -1, 84, 60, 124, 146, 144, 145, 132, 52, 98, -1, -1, -1, 37, 38, 25, 26, -1, -1, 147, 148, 140, 141, 116, 117, -1, -1, 27, 28, 138, 139, 39, 40, 133, 136, 135, 134, 66, 41, 23, 46, 61, 62, 13, 14, 15, -1, 85, 57, 51, 49, 87, -1, -1, 10, 11, 12, 68, -1, 55, 97, 42, 150, 143, 129, -1, -1, 89, -1, 99, 91, -1, 101, 36, 110, 53, 105, -1, 93, 63, 65, 17, 18, 121, 1, 3, 73, -1, 118, 119, -1, -1, -1, -1, 77, 78, 19, 20, 33, 30, 74, 137, 142, -1, 81, -1, -1, 4, 7, 5, 8, 6, -1, -1, -1, -1, 43, 44, 45, 69, 70, 71]
     (0..party_size - 1).each do |i|
-      pokemon_index = save_file[pokemon_offset]
-      pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
-      current_hp = (save_file[pokemon_offset + 1] << 8) + save_file[pokemon_offset + 2]
-      status_condition = save_file[pokemon_offset + 4]
-      type1_id = save_file[pokemon_offset + 5]
-      type2_id = save_file[pokemon_offset + 6]
-      move1_id = save_file[pokemon_offset + 8]
-      move2_id = save_file[pokemon_offset + 9]
-      move3_id = save_file[pokemon_offset + 0xA]
-      move4_id = save_file[pokemon_offset + 0xB]
-      level = save_file[pokemon_offset + 0x21]
-      max_hp = (save_file[pokemon_offset + 0x22] << 8) + save_file[pokemon_offset + 0x23]
       nickname_offset = nicknames_offset + (i * max_nickname_size)
-      nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
-      nickname = translate_game_string(nickname, @mappings)
-
-      pokemon = PokemonStruct.new(pokemon_id: pokemon_id, current_hp: current_hp, status_condition: status_condition, type1_id: type1_id, type2_id: type2_id, move1_id: move1_id, move2_id: move2_id, move3_id: move3_id, move4_id: move4_id, max_hp: max_hp, level: level, nickname: nickname)
+      pokemon = get_pokemon_from_save(save_file, pokemon_offset, nickname_offset, true)
       party_pokemon.push(pokemon)
       pokemon_offset += pokemon_size
     end
@@ -103,6 +113,7 @@ class Gen1EntriesController < ApplicationController
         pokemon_offset = current_offset + (j * pokemon_size)
         pokemon_index = save_file[pokemon_offset]
         next if pokemon_index.zero? || pokemon_index == 0xFF
+
         pokemon_id = @pokemon_indexes_to_id_arr[pokemon_index - 1]
 
         level = save_file[pokemon_offset + 1]
