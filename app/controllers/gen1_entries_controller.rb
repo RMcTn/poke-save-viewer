@@ -32,7 +32,6 @@ class Gen1EntriesController < ApplicationController
     move2_id = save_file[pokemon_offset + 9]
     move3_id = save_file[pokemon_offset + 0xA]
     move4_id = save_file[pokemon_offset + 0xB]
-    # nickname_offset = nicknames_offset + (i * max_nickname_size)
     max_nickname_size = 0xB
     nickname = save_file[nickname_offset..nickname_offset + max_nickname_size]
     nickname = translate_game_string(nickname, @mappings)
@@ -127,6 +126,27 @@ class Gen1EntriesController < ApplicationController
     hall_of_fame_entries
   end
 
+  def get_current_box_pokemon(save_file)
+    pokemon_box_offset = 0x30C0
+    pokemon_size = 0x21
+    max_pokemon_in_a_box = 20
+    max_nickname_size = 0xB
+    nicknames_offset = pokemon_box_offset + 0x386
+
+    box_pokemon = []
+    pokemon_count = save_file[pokemon_box_offset]
+    return box_pokemon if pokemon_count.zero?
+
+    (0..pokemon_count - 1).each do |i|
+      pokemon_data_offset = pokemon_box_offset + 0x16 + (i * pokemon_size)
+      nickname_offset = nicknames_offset + (i * max_nickname_size)
+      pokemon = get_pokemon_from_save(save_file, pokemon_data_offset, nickname_offset, false)
+      box_pokemon.push(pokemon)
+    end
+
+    box_pokemon
+  end
+
   # GET /gen1_entries or /gen1_entries.json
   def index
     @gen1_entries = Gen1Entry.all
@@ -185,7 +205,16 @@ class Gen1EntriesController < ApplicationController
       end
     end
 
-    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, hall of fame
+    current_box_pokemon = get_current_box_pokemon(uploaded_file.bytes)
+    current_box = Gen1Box.create(gen1_entry: @gen1_entry)
+    current_box_pokemon.each do |pokemon|
+      # TODO: Level and max hp can be calculated for box pokemon. See https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
+      created_pokemon = Pokemon.create(gen1_box: current_box, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, nickname: pokemon.nickname)
+      current_box.pokemons.push(created_pokemon)
+    end
+
+    # Baseline: Player name, each pokemon in party, gyms completed, each pokemon in boxes, time played, hall of fame, daycare?
+    # TODO Status condition for pokemon
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
     #
