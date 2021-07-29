@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Gen2 Entries</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @gen2_entries.each do |gen2_entry| %>
+      <tr>
+        <td><%= link_to 'Show', gen2_entry %></td>
+        <td><%= link_to 'Edit', edit_gen2_entry_path(gen2_entry) %></td>
+        <td><%= link_to 'Destroy', gen2_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Gen2 Entry', new_gen2_entry_path %>

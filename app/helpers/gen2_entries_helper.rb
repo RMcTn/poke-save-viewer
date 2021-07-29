@@ -1,0 +1,2 @@
+module Gen2EntriesHelper
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_26_223453) do
+ActiveRecord::Schema.define(version: 2021_07_29_091352) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,12 @@ ActiveRecord::Schema.define(version: 2021_07_26_223453) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["gen1_hall_of_fame_entry_id"], name: "index_gen1_hall_of_fame_pokemons_on_gen1_hall_of_fame_entry_id"
+  end
+
+  create_table "gen2_entries", force: :cascade do |t|
+    t.text "player_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "parties", force: :cascade do |t|
