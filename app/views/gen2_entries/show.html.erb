@@ -5,5 +5,10 @@
   <%= @gen2_entry.player_name %>
 </p>
 
+<p>
+  <strong>Party:</strong>
+  <%= render @gen2_entry.gen2_party %>
+</p>
+
 <%= link_to 'Edit', edit_gen2_entry_path(@gen2_entry) %> |
 <%= link_to 'Back', gen2_entries_path %>

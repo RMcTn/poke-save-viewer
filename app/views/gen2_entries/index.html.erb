@@ -4,19 +4,21 @@
 
 <table>
   <thead>
-    <tr>
-      <th colspan="3"></th>
-    </tr>
+  <tr>
+    <th colspan="3"></th>
+  </tr>
   </thead>
 
   <tbody>
-    <% @gen2_entries.each do |gen2_entry| %>
-      <tr>
-        <td><%= link_to 'Show', gen2_entry %></td>
-        <td><%= link_to 'Edit', edit_gen2_entry_path(gen2_entry) %></td>
-        <td><%= link_to 'Destroy', gen2_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
+  <% @gen2_entries.each do |gen2_entry| %>
+    <tr>
+      <td><%= gen2_entry.player_name %></td>
+      <td><%= link_to gen2_entry.save_file.filename, gen2_entry.save_file if gen2_entry.save_file.attached? %></td>
+      <td><%= link_to 'Show', gen2_entry %></td>
+      <td><%= link_to 'Edit', edit_gen2_entry_path(gen2_entry) %></td>
+      <td><%= link_to 'Destroy', gen2_entry, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
+  <% end %>
   </tbody>
 </table>
 

@@ -1,0 +1,19 @@
+<div class="pokemon">
+  <img class="pokemon-sprite" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= gen2_pokemon.pokemon_id %>.png"/>
+  <ul>
+    <li>pokemon id: <%= gen2_pokemon.pokemon_id %></li>
+    <li>nickname: <%= gen2_pokemon.nickname %></li>
+    <% unless gen2_pokemon.level.nil? %>
+      <li>level: <%= gen2_pokemon.level %></li>
+    <% end %>
+    <% unless gen2_pokemon.max_hp.nil? %>
+      <li>max_hp: <%= gen2_pokemon.max_hp %></li>
+    <% end %>
+    <li>current_hp: <%= gen2_pokemon.current_hp %></li>
+    <% unless gen2_pokemon.max_hp.nil? %>
+      <li><%= gen2_pokemon.current_hp %>/<%= gen2_pokemon.max_hp %> HP</li>
+    <% end %>
+    <li>type1: <%= gen2_pokemon.type1 %></li>
+    <li>type2: <%= gen2_pokemon.type2 %></li>
+  </ul>
+</div>
