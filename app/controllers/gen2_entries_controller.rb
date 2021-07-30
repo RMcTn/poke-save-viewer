@@ -90,6 +90,21 @@ class Gen2EntriesController < ApplicationController
     (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
   end
 
+  def get_johto_badges(save_file)
+    johto_badges_offset = 0x23E4
+    # Each bit is a badge, MSB to LSB is Zephyr, Insect, Plain, Fog, Storm, Mineral, Glacier, Rising
+    badges_bit_field = save_file[johto_badges_offset]
+    obtained_badges = []
+    obtained_badges.push("Zephyr") if (badges_bit_field >> 7 & 0x1) != 0
+    obtained_badges.push("Insect") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Plain") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Fog") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Storm") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Mineral") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Glacier") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Rising") if (badges_bit_field & 0x1) != 0
+  end
+
   # POST /gen2_entries or /gen2_entries.json
   def create
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
@@ -119,6 +134,9 @@ class Gen2EntriesController < ApplicationController
       created_pokemon = Gen2Pokemon.create(gen2_party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
       party.gen2_pokemons.push(created_pokemon)
     end
+
+    johto_badges = get_johto_badges(uploaded_file.bytes)
+    @gen2_entry.johto_badges = johto_badges
 
     respond_to do |format|
       if @gen2_entry.save
