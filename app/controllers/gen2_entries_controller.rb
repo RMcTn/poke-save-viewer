@@ -82,6 +82,14 @@ class Gen2EntriesController < ApplicationController
     save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
   end
 
+  def get_playtime_in_seconds(save_file)
+    playtime_offset = 0x2053
+    playtime_hours = save_file[playtime_offset + 1]
+    playtime_minutes = save_file[playtime_offset + 2]
+    playtime_seconds = save_file[playtime_offset + 3]
+    (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
+  end
+
   # POST /gen2_entries or /gen2_entries.json
   def create
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
@@ -101,6 +109,9 @@ class Gen2EntriesController < ApplicationController
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
 
     @gen2_entry.player_name = player_name
+
+    playtime = get_playtime_in_seconds(uploaded_file.bytes)
+    @gen2_entry.playtime = playtime
 
     party_pokemon = get_player_party(uploaded_file.bytes)
     party = Gen2Party.create(gen2_entry: @gen2_entry)
