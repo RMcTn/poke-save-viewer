@@ -105,6 +105,21 @@ class Gen2EntriesController < ApplicationController
     obtained_badges.push("Rising") if (badges_bit_field & 0x1) != 0
   end
 
+  def get_kanto_badges(save_file)
+    gym_badges_offset = 0x23E5
+    # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
+    badges_bit_field = save_file[gym_badges_offset]
+    obtained_badges = []
+    obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
+    obtained_badges.push("Cascade") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Thunder") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Rainbow") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Soul") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Marsh") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Volcano") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
+  end
+
   # POST /gen2_entries or /gen2_entries.json
   def create
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
@@ -135,8 +150,12 @@ class Gen2EntriesController < ApplicationController
       party.gen2_pokemons.push(created_pokemon)
     end
 
+    # TODO: Check if kanto badges are stored
     johto_badges = get_johto_badges(uploaded_file.bytes)
     @gen2_entry.johto_badges = johto_badges
+
+    kanto_badges = get_kanto_badges(uploaded_file.bytes)
+    @gen2_entry.kanto_badges = kanto_badges
 
     respond_to do |format|
       if @gen2_entry.save
