@@ -27,6 +27,10 @@
   <%= render @gen2_entry.gen2_party %>
 </p>
 
+<p>
+  <strong>Hall of fame</strong>
+  <%= render @gen2_entry.gen2_hall_of_fame_entries %>
+</p>
 
 <%= link_to 'Edit', edit_gen2_entry_path(@gen2_entry) %> |
 <%= link_to 'Back', gen2_entries_path %>

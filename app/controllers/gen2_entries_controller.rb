@@ -120,6 +120,36 @@ class Gen2EntriesController < ApplicationController
     obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
   end
 
+  def get_hall_of_fame_entries(save_file)
+    hall_of_fame_offset = 0x321A
+    max_hall_of_fame_record_count = 50
+    pokemon_size = 16
+    max_pokemon_per_record = 6
+    hall_of_fame_entries = []
+    max_nickname_size = 0xB
+    (0..max_hall_of_fame_record_count - 1).each do |i|
+      # TODO Try with an entry of 5 pokemon
+      current_offset = hall_of_fame_offset + (pokemon_size * max_pokemon_per_record * i) + (2 * i) # 2 Bytes for FF terminatior and hall of fame id
+      hall_of_fame_id = save_file[current_offset]
+      return hall_of_fame_entries if hall_of_fame_id.zero?
+
+      hall_of_fame_entries.push([])
+      (0..max_pokemon_per_record - 1).each do |j|
+        pokemon_offset = current_offset + (j * pokemon_size)
+        pokemon_id = save_file[pokemon_offset + 1]
+        next if pokemon_id.zero? || pokemon_id == 0xFF
+
+        level = save_file[pokemon_offset + 6]
+        nickname = save_file[pokemon_offset + 7..pokemon_offset + 7 + max_nickname_size]
+        nickname = translate_game_string(nickname, @mappings)
+        pokemon = Gen2PokemonStruct.new(pokemon_id: pokemon_id, level: level, nickname: nickname)
+        pokemons = hall_of_fame_entries[i]
+        pokemons.push(pokemon)
+      end
+    end
+    hall_of_fame_entries
+  end
+
   # POST /gen2_entries or /gen2_entries.json
   def create
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
@@ -156,6 +186,17 @@ class Gen2EntriesController < ApplicationController
 
     kanto_badges = get_kanto_badges(uploaded_file.bytes)
     @gen2_entry.kanto_badges = kanto_badges
+
+    hall_of_fame_entries = get_hall_of_fame_entries(uploaded_file.bytes)
+    hall_of_fame_entries.each do |entry|
+      hall_of_fame_entry = Gen2HallOfFameEntry.create(gen2_entry: @gen2_entry)
+      entry.each do |pokemon|
+        created_pokemon = Gen2HallOfFamePokemon.create(pokemon_id: pokemon.pokemon_id, level: pokemon.level, nickname: pokemon.nickname)
+        hall_of_fame_entry.gen2_hall_of_fame_pokemons.push(created_pokemon)
+      end
+    end
+
+    # TODO: See what kanto elite 4 shows up as
 
     respond_to do |format|
       if @gen2_entry.save
