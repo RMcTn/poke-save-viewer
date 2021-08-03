@@ -53,10 +53,13 @@ class Gen2EntriesController < ApplicationController
 
   end
 
-  def get_player_party(save_file)
+  def get_player_party(save_file, game)
     # See https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_II) for offsets
     party_pokemon = []
     party_offset = 0x288A
+    if game == "crystal"
+      party_offset = 0x2865
+    end
     party_size = save_file[party_offset].to_i
     # Amount of characters in a string varies from English to Japanese versions. See https://bulbapedia.bulbagarden.net/wiki/Save_data_structure_(Generation_II)#Pok.C3.A9mon_lists
     # Focusing on English only for now
@@ -82,19 +85,26 @@ class Gen2EntriesController < ApplicationController
     save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
   end
 
-  def get_playtime_in_seconds(save_file)
-    playtime_offset = 0x2053
-    playtime_hours = save_file[playtime_offset + 1]
-    playtime_minutes = save_file[playtime_offset + 2]
-    playtime_seconds = save_file[playtime_offset + 3]
+  def get_playtime_in_seconds(save_file, game)
+    playtime_offset = 0x2054
+    if game == "crystal"
+      playtime_offset = 0x2053
+    end
+    playtime_hours = save_file[playtime_offset]
+    playtime_minutes = save_file[playtime_offset]
+    playtime_seconds = save_file[playtime_offset]
     (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
   end
 
-  def get_johto_badges(save_file)
+  def get_johto_badges(save_file, game)
     johto_badges_offset = 0x23E4
+    if game == "crystal"
+      johto_badges_offset = 0x23E5
+    end
     # Each bit is a badge, MSB to LSB is Zephyr, Insect, Plain, Fog, Storm, Mineral, Glacier, Rising
     badges_bit_field = save_file[johto_badges_offset]
     obtained_badges = []
+    # TODO: Check if this is backwards or not?
     obtained_badges.push("Zephyr") if (badges_bit_field >> 7 & 0x1) != 0
     obtained_badges.push("Insect") if (badges_bit_field >> 6 & 0x1) != 0
     obtained_badges.push("Plain") if (badges_bit_field >> 5 & 0x1) != 0
@@ -106,10 +116,11 @@ class Gen2EntriesController < ApplicationController
   end
 
   def get_kanto_badges(save_file)
-    gym_badges_offset = 0x23E5
+    gym_badges_offset = 0x23E6
     # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
     badges_bit_field = save_file[gym_badges_offset]
     obtained_badges = []
+    # TODO: Check if this is backwards or not?
     obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
     obtained_badges.push("Cascade") if (badges_bit_field >> 6 & 0x1) != 0
     obtained_badges.push("Thunder") if (badges_bit_field >> 5 & 0x1) != 0
@@ -120,8 +131,11 @@ class Gen2EntriesController < ApplicationController
     obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
   end
 
-  def get_hall_of_fame_entries(save_file)
+  def get_hall_of_fame_entries(save_file, game)
     hall_of_fame_offset = 0x321A
+    if game == "crystal"
+      hall_of_fame_offset = 0x32C0
+    end
     max_hall_of_fame_record_count = 50
     pokemon_size = 16
     max_pokemon_per_record = 6
@@ -152,8 +166,9 @@ class Gen2EntriesController < ApplicationController
 
   # POST /gen2_entries or /gen2_entries.json
   def create
+    # TODO Could use player gender to differentiate between gold/silver and crystal offset 0x3E3D
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
-
+    selected_game = params[:gen2_game]
     # TODO: Populate the mapping only once
     # TODO: Check if gen2 has different character mappings
     @mappings = Hash.new
@@ -170,24 +185,23 @@ class Gen2EntriesController < ApplicationController
 
     @gen2_entry.player_name = player_name
 
-    playtime = get_playtime_in_seconds(uploaded_file.bytes)
+    playtime = get_playtime_in_seconds(uploaded_file.bytes, selected_game)
     @gen2_entry.playtime = playtime
 
-    party_pokemon = get_player_party(uploaded_file.bytes)
+    party_pokemon = get_player_party(uploaded_file.bytes, selected_game)
     party = Gen2Party.create(gen2_entry: @gen2_entry)
     party_pokemon.each do |pokemon|
       created_pokemon = Gen2Pokemon.create(gen2_party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
       party.gen2_pokemons.push(created_pokemon)
     end
 
-    # TODO: Check if kanto badges are stored
-    johto_badges = get_johto_badges(uploaded_file.bytes)
+    johto_badges = get_johto_badges(uploaded_file.bytes, selected_game)
     @gen2_entry.johto_badges = johto_badges
 
     kanto_badges = get_kanto_badges(uploaded_file.bytes)
     @gen2_entry.kanto_badges = kanto_badges
 
-    hall_of_fame_entries = get_hall_of_fame_entries(uploaded_file.bytes)
+    hall_of_fame_entries = get_hall_of_fame_entries(uploaded_file.bytes, selected_game)
     hall_of_fame_entries.each do |entry|
       hall_of_fame_entry = Gen2HallOfFameEntry.create(gen2_entry: @gen2_entry)
       entry.each do |pokemon|
@@ -195,8 +209,6 @@ class Gen2EntriesController < ApplicationController
         hall_of_fame_entry.gen2_hall_of_fame_pokemons.push(created_pokemon)
       end
     end
-
-    # TODO: See what kanto elite 4 shows up as
 
     respond_to do |format|
       if @gen2_entry.save
@@ -240,6 +252,6 @@ class Gen2EntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def gen2_entry_params
-    params.require(:gen2_entry).permit(:save_file)
+    params.require(:gen2_entry).permit(:save_file, :gen2_game)
   end
 end
