@@ -117,10 +117,13 @@ class Gen2EntriesController < ApplicationController
     obtained_badges.push("Rising") if (badges_bit_field & 0x1) != 0
   end
 
-  def get_kanto_badges(save_file)
-    gym_badges_offset = 0x23E6
+  def get_kanto_badges(save_file, game)
+    kanto_badges_offset = 0x23E5
+    if game == "crystal"
+      kanto_badges_offset = 0x23E6
+    end
     # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
-    badges_bit_field = save_file[gym_badges_offset]
+    badges_bit_field = save_file[kanto_badges_offset]
     obtained_badges = []
     # TODO: Check if this is backwards or not?
     obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
@@ -199,7 +202,7 @@ class Gen2EntriesController < ApplicationController
     johto_badges = get_johto_badges(uploaded_file.bytes, selected_game)
     @gen2_entry.johto_badges = johto_badges
 
-    kanto_badges = get_kanto_badges(uploaded_file.bytes)
+    kanto_badges = get_kanto_badges(uploaded_file.bytes, selected_game)
     @gen2_entry.kanto_badges = kanto_badges
 
     if party_pokemon.size > @@max_pokemon_in_party
