@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_02_145534) do
+ActiveRecord::Schema.define(version: 2021_08_04_132854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(version: 2021_08_02_145534) do
     t.integer "playtime"
     t.string "johto_badges", default: [], array: true
     t.string "kanto_badges", default: [], array: true
+    t.string "game"
   end
 
   create_table "gen2_hall_of_fame_entries", force: :cascade do |t|
@@ -125,6 +126,11 @@ ActiveRecord::Schema.define(version: 2021_08_02_145534) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["gen2_party_id"], name: "index_gen2_pokemons_on_gen2_party_id"
+  end
+
+  create_table "gen3_entries", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "parties", force: :cascade do |t|

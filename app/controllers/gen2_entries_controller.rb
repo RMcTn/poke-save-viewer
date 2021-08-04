@@ -3,6 +3,8 @@ class Gen2EntriesController < ApplicationController
 
   Gen2PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
+  @@max_pokemon_in_party = 6
+
   def translate_game_string(game_str, character_mapping)
     translated_string = ""
     terminating_character = 0x50
@@ -168,7 +170,6 @@ class Gen2EntriesController < ApplicationController
   def create
     # TODO Could use player gender to differentiate between gold/silver and crystal offset 0x3E3D
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
-    selected_game = params[:gen2_game]
     # TODO: Populate the mapping only once
     # TODO: Check if gen2 has different character mappings
     @mappings = Hash.new
@@ -178,7 +179,12 @@ class Gen2EntriesController < ApplicationController
       @mappings[poke_char] = splits[0]
     end
 
-    # TODO: Possible to have different offsets from gold/silver to crystal, will need to handle
+    selected_game = params[:gen2_game]
+    @gen2_entry.game = selected_game
+    if not @gen2_entry.valid?
+      render :new
+      return
+    end
 
     uploaded_file = File.binread(params[:gen2_entry][:save_file])
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
@@ -189,17 +195,25 @@ class Gen2EntriesController < ApplicationController
     @gen2_entry.playtime = playtime
 
     party_pokemon = get_player_party(uploaded_file.bytes, selected_game)
-    party = Gen2Party.create(gen2_entry: @gen2_entry)
-    party_pokemon.each do |pokemon|
-      created_pokemon = Gen2Pokemon.create(gen2_party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
-      party.gen2_pokemons.push(created_pokemon)
-    end
 
     johto_badges = get_johto_badges(uploaded_file.bytes, selected_game)
     @gen2_entry.johto_badges = johto_badges
 
     kanto_badges = get_kanto_badges(uploaded_file.bytes)
     @gen2_entry.kanto_badges = kanto_badges
+
+    if party_pokemon.size > @@max_pokemon_in_party
+      # TODO Error here since selected game is probably wrong
+      @gen2_entry.errors.add :base, :too_many_pokemon, message: "Too many pokemon in party. Was the right game selected?"
+      render :new
+      return
+    end
+
+    party = Gen2Party.create(gen2_entry: @gen2_entry)
+    party_pokemon.each do |pokemon|
+      created_pokemon = Gen2Pokemon.create(gen2_party: party, pokemon_id: pokemon.pokemon_id, current_hp: pokemon.current_hp, status_condition: pokemon.status_condition, type1: pokemon.type1_id, type2: pokemon.type2_id, move1_id: pokemon.move1_id, move2_id: pokemon.move2_id, move3_id: pokemon.move3_id, move4_id: pokemon.move4_id, max_hp: pokemon.max_hp, level: pokemon.level, nickname: pokemon.nickname)
+      party.gen2_pokemons.push(created_pokemon)
+    end
 
     hall_of_fame_entries = get_hall_of_fame_entries(uploaded_file.bytes, selected_game)
     hall_of_fame_entries.each do |entry|
