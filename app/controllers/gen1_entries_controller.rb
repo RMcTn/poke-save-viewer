@@ -178,6 +178,13 @@ class Gen1EntriesController < ApplicationController
       @mappings[poke_char] = splits[0]
     end
 
+    selected_game = params[:gen1_game]
+    @gen1_entry.game = selected_game
+    if not @gen1_entry.valid?
+      render :new
+      return
+    end
+
     uploaded_file = File.binread(params[:gen1_entry][:saveFile])
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
     @gen1_entry.playerName = player_name
@@ -264,6 +271,6 @@ class Gen1EntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def gen1_entry_params
-    params.require(:gen1_entry).permit(:saveFile)
+    params.require(:gen1_entry).permit(:saveFile, :gen1_game)
   end
 end

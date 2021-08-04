@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_04_132854) do
+ActiveRecord::Schema.define(version: 2021_08_04_153832) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(version: 2021_08_04_132854) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "badges", default: [], array: true
     t.integer "playtime"
+    t.string "game"
   end
 
   create_table "gen1_hall_of_fame_entries", force: :cascade do |t|
