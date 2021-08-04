@@ -13,6 +13,7 @@
   <% @gen2_entries.each do |gen2_entry| %>
     <tr>
       <td><%= gen2_entry.player_name %></td>
+      <td><%= gen2_entry.game.titleize %></td>
       <td><%= link_to gen2_entry.save_file.filename, gen2_entry.save_file if gen2_entry.save_file.attached? %></td>
       <td><%= link_to 'Show', gen2_entry %></td>
       <td><%= link_to 'Edit', edit_gen2_entry_path(gen2_entry) %></td>
