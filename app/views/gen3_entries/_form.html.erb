@@ -1,0 +1,22 @@
+<%= form_with(model: gen3_entry) do |form| %>
+  <% if gen3_entry.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(gen3_entry.errors.count, "error") %> prohibited this gen3_entry from being saved:</h2>
+
+      <ul>
+        <% gen3_entry.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :save_file %>
+    <%= form.file_field :save_file %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

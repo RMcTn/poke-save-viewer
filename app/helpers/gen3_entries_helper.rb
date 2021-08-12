@@ -1,0 +1,2 @@
+module Gen3EntriesHelper
+end
