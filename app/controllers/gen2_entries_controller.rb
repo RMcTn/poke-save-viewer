@@ -93,8 +93,8 @@ class Gen2EntriesController < ApplicationController
       playtime_offset = 0x2053
     end
     playtime_hours = save_file[playtime_offset]
-    playtime_minutes = save_file[playtime_offset]
-    playtime_seconds = save_file[playtime_offset]
+    playtime_minutes = save_file[playtime_offset + 1]
+    playtime_seconds = save_file[playtime_offset + 2]
     (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
   end
 
