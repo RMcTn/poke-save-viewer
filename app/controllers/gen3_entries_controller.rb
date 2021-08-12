@@ -1,6 +1,24 @@
 class Gen3EntriesController < ApplicationController
   before_action :set_gen3_entry, only: %i[ show edit update destroy ]
 
+  def translate_game_string(game_str, character_mapping)
+    translated_string = ""
+    terminating_character = 0xFF
+    game_str.each do |byte|
+      return translated_string if (byte == '0') || (byte == terminating_character)
+
+      mapped_character = character_mapping[byte]
+      translated_string += mapped_character unless mapped_character.nil?
+    end
+    translated_string
+  end
+
+  def get_player_name(save_file)
+    player_name_offset = 0x2000
+    player_name_max_size = 0x7
+    save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
+  end
+
   # GET /gen3_entries or /gen3_entries.json
   def index
     @gen3_entries = Gen3Entry.all
@@ -19,20 +37,21 @@ class Gen3EntriesController < ApplicationController
   def edit
   end
 
-  def get_player_name(save_file)
-    # TODO
-  end
-
-  def translate_game_string(string, mappings)
-    # TODO
-  end
-
   # POST /gen3_entries or /gen3_entries.json
   def create
     @gen3_entry = Gen3Entry.new(gen3_entry_params)
 
     # TODO: We have ruby sapphire emerald, and fire red, leaf green. a lot of different offsets
     # Focusing on ruby + sapphire for now
+    #
+    # TODO: NOTE: Wiki says save has a game code to tell apart the game https://bulbapedia.bulbagarden.net/wiki/Save_data_structure_(Generation_III)
+    @mappings = Hash.new
+    File.readlines("gen3_english_mappings.txt").each do |line|
+      splits = line.split(' ')
+      poke_char = splits[1].to_i(16)
+      ## TODO Check what the unicode values are like
+      @mappings[poke_char] = splits[0]
+    end
 
     uploaded_file = File.binread(params[:gen3_entry][:save_file])
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
