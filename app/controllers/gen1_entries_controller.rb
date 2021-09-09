@@ -69,18 +69,18 @@ class Gen1EntriesController < ApplicationController
   end
 
   def get_badges_obtained(save_file)
-    gym_badges_offset = 0x29D6
+    gym_badges_offset = 0x2602
     # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
     badges_bit_field = save_file[gym_badges_offset]
     obtained_badges = []
-    obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
-    obtained_badges.push("Cascade") if (badges_bit_field >> 6 & 0x1) != 0
-    obtained_badges.push("Thunder") if (badges_bit_field >> 5 & 0x1) != 0
-    obtained_badges.push("Rainbow") if (badges_bit_field >> 4 & 0x1) != 0
-    obtained_badges.push("Soul") if (badges_bit_field >> 3 & 0x1) != 0
-    obtained_badges.push("Marsh") if (badges_bit_field >> 2 & 0x1) != 0
-    obtained_badges.push("Volcano") if (badges_bit_field >> 1 & 0x1) != 0
-    obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
+    obtained_badges.push("Boulder") if (badges_bit_field >> 0 & 0x1) != 0
+    obtained_badges.push("Cascade") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Thunder") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Rainbow") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Soul") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Marsh") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Volcano") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Earth") if (badges_bit_field >> 0 & 0x1) != 0
   end
 
   def get_playtime_in_seconds(save_file)

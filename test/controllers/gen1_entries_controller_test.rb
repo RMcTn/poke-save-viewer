@@ -108,7 +108,7 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_difference('Gen1Entry.count') do
       post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
     end
-    assert(Gen1Entry.last.badges == ["Boulder", "Cascade", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth"])
+    assert_equal(["Boulder", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth"], Gen1Entry.last.badges)
   end
 
   test "should get pokemon from currently selected box gen1 save" do
