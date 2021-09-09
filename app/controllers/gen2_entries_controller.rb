@@ -40,6 +40,8 @@ class Gen2EntriesController < ApplicationController
     #
     # TODO: Egg has an id of 0xFD
     pokemon_id = save_file[pokemon_offset]
+    # TODO: Use pokemon id to index into an array of type pairs
+    # TODO: These move IDs are just indexes into the move list. Will need to sort something out
     move1_id = save_file[pokemon_offset + 2]
     move2_id = save_file[pokemon_offset + 3]
     move3_id = save_file[pokemon_offset + 4]
