@@ -105,18 +105,16 @@ class Gen2EntriesController < ApplicationController
     if game == "crystal"
       johto_badges_offset = 0x23E5
     end
-    # Each bit is a badge, MSB to LSB is Zephyr, Insect, Plain, Fog, Storm, Mineral, Glacier, Rising
     badges_bit_field = save_file[johto_badges_offset]
     obtained_badges = []
-    # TODO: Check if this is backwards or not?
-    obtained_badges.push("Zephyr") if (badges_bit_field >> 7 & 0x1) != 0
-    obtained_badges.push("Insect") if (badges_bit_field >> 6 & 0x1) != 0
-    obtained_badges.push("Plain") if (badges_bit_field >> 5 & 0x1) != 0
-    obtained_badges.push("Fog") if (badges_bit_field >> 4 & 0x1) != 0
-    obtained_badges.push("Storm") if (badges_bit_field >> 3 & 0x1) != 0
-    obtained_badges.push("Mineral") if (badges_bit_field >> 2 & 0x1) != 0
-    obtained_badges.push("Glacier") if (badges_bit_field >> 1 & 0x1) != 0
-    obtained_badges.push("Rising") if (badges_bit_field & 0x1) != 0
+    obtained_badges.push("Zephyr") if (badges_bit_field >> 0 & 0x1) != 0
+    obtained_badges.push("Insect") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Plain") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Fog") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Storm") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Mineral") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Glacier") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Rising") if (badges_bit_field >> 7 & 0x1) != 0
   end
 
   def get_kanto_badges(save_file, game)
@@ -124,18 +122,16 @@ class Gen2EntriesController < ApplicationController
     if game == "crystal"
       kanto_badges_offset = 0x23E6
     end
-    # Each bit is a badge, MSB to LSB is Boulder, Cascade, Thunder, Rainbow, Soul, Marsh, Volcano, Earth.
     badges_bit_field = save_file[kanto_badges_offset]
     obtained_badges = []
-    # TODO: Check if this is backwards or not?
-    obtained_badges.push("Boulder") if (badges_bit_field >> 7 & 0x1) != 0
-    obtained_badges.push("Cascade") if (badges_bit_field >> 6 & 0x1) != 0
-    obtained_badges.push("Thunder") if (badges_bit_field >> 5 & 0x1) != 0
-    obtained_badges.push("Rainbow") if (badges_bit_field >> 4 & 0x1) != 0
-    obtained_badges.push("Soul") if (badges_bit_field >> 3 & 0x1) != 0
-    obtained_badges.push("Marsh") if (badges_bit_field >> 2 & 0x1) != 0
-    obtained_badges.push("Volcano") if (badges_bit_field >> 1 & 0x1) != 0
-    obtained_badges.push("Earth") if (badges_bit_field & 0x1) != 0
+    obtained_badges.push("Boulder") if (badges_bit_field >> 0 & 0x1) != 0
+    obtained_badges.push("Cascade") if (badges_bit_field >> 1 & 0x1) != 0
+    obtained_badges.push("Thunder") if (badges_bit_field >> 2 & 0x1) != 0
+    obtained_badges.push("Rainbow") if (badges_bit_field >> 3 & 0x1) != 0
+    obtained_badges.push("Soul") if (badges_bit_field >> 4 & 0x1) != 0
+    obtained_badges.push("Marsh") if (badges_bit_field >> 5 & 0x1) != 0
+    obtained_badges.push("Volcano") if (badges_bit_field >> 6 & 0x1) != 0
+    obtained_badges.push("Earth") if (badges_bit_field >> 7 & 0x1) != 0
   end
 
   def get_hall_of_fame_entries(save_file, game)
