@@ -1,5 +1,6 @@
 class Gen2EntriesController < ApplicationController
   before_action :set_gen2_entry, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
 
   Gen2PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
@@ -171,6 +172,8 @@ class Gen2EntriesController < ApplicationController
   def create
     # TODO Could use player gender to differentiate between gold/silver and crystal offset 0x3E3D
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
+
+    @gen2_entry.user = current_user
     # TODO: Populate the mapping only once
     # TODO: Check if gen2 has different character mappings
     @mappings = Hash.new

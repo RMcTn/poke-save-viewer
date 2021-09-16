@@ -11,3 +11,8 @@ user_no_gen1_entries:
   confirmed_at: 2021-09-16 18:02:23
   confirmation_sent_at: 2021-09-16 18:01:23
 
+user_no_gen2_entries:
+  email: user_no_gen2@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  confirmed_at: 2021-09-16 18:02:23
+  confirmation_sent_at: 2021-09-16 18:01:23

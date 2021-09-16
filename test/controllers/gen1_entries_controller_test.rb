@@ -8,6 +8,12 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
     @save_file_red = fixture_file_upload("Red - Poison.sav", "application/octet-stream", true)
   end
 
+  test "should require login to view index" do
+    sign_out :user
+    get gen1_entries_url
+    assert_response :redirect
+  end
+
   test "should get index" do
     get gen1_entries_url
     assert_response :success

@@ -1,8 +1,17 @@
 require "test_helper"
 
 class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
+    sign_in users(:user_no_gen2_entries)
     @save_file_gold = fixture_file_upload("Gold - Poison.sav", "application/octet-stream", true)
+  end
+
+  test "should require login to view index" do
+    sign_out :user
+    get gen2_entries_url
+    assert_response :redirect
   end
 
   test "should get index" do

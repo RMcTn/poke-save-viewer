@@ -5,4 +5,5 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :confirmable
 
   has_many :gen1_entries, dependent: :delete_all
+  has_many :gen2_entries, dependent: :delete_all
 end

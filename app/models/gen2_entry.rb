@@ -6,5 +6,6 @@ class Gen2Entry < ApplicationRecord
   # TODO: Look into polymorhpic relations in rails, might solve the duplicating of pokemon/parties between gen1/2
   has_many :gen2_hall_of_fame_entries
 
+  belongs_to :user, dependent: :delete
   # TODO Move gen entry controller logic to models, will help with errors
 end
