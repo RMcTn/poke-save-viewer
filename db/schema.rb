@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_12_162354) do
+ActiveRecord::Schema.define(version: 2021_09_16_144232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,8 @@ ActiveRecord::Schema.define(version: 2021_08_12_162354) do
     t.string "badges", default: [], array: true
     t.integer "playtime"
     t.string "game"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_gen1_entries_on_user_id"
   end
 
   create_table "gen1_hall_of_fame_entries", force: :cascade do |t|
@@ -164,9 +166,27 @@ ActiveRecord::Schema.define(version: 2021_08_12_162354) do
     t.index ["party_id"], name: "index_pokemons_on_party_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "gen1_boxes", "gen1_entries"
+  add_foreign_key "gen1_entries", "users"
   add_foreign_key "gen1_hall_of_fame_entries", "gen1_entries"
   add_foreign_key "gen1_hall_of_fame_pokemons", "gen1_hall_of_fame_entries"
   add_foreign_key "gen2_hall_of_fame_entries", "gen2_entries"

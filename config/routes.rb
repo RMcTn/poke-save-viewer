@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  devise_for :users
+  root to: "gen1_entries#index"
   resources :gen3_entries
   resources :gen2_entries
   resources :gen1_entries

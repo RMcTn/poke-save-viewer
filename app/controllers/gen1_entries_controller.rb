@@ -1,5 +1,6 @@
 class Gen1EntriesController < ApplicationController
   before_action :set_gen1_entry, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
 
   PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
@@ -169,6 +170,7 @@ class Gen1EntriesController < ApplicationController
   # POST /gen1_entries or /gen1_entries.json
   def create
     @gen1_entry = Gen1Entry.new(gen1_entry_params)
+    @gen1_entry.user = current_user
 
     # TODO: Populate the mapping only once
     @mappings = Hash.new
@@ -224,11 +226,7 @@ class Gen1EntriesController < ApplicationController
     # TODO Status condition for pokemon
     # https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_I)
     # Potentially different offsets for different pokemon gen 1 versions (red, blue, yellow). Just stick with red for now
-    #
-    # TODO: On cascade delete things for pokemon + party + gen1 hall of fame etc
 
-    # TODO: Can't get what game it is from the savefile, will need to have user input (dropdown?)
-    # TODO: pokemon red and blue are identical, so only pokemon red/blue then yellow need to be pickable values
     respond_to do |format|
       if @gen1_entry.save
         format.html { redirect_to @gen1_entry, notice: "Gen1 entry was successfully created." }

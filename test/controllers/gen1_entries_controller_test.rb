@@ -1,7 +1,10 @@
 require "test_helper"
 
 class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
+    sign_in users(:user_no_gen1_entries)
     @save_file_red = fixture_file_upload("Red - Poison.sav", "application/octet-stream", true)
   end
 

@@ -4,4 +4,5 @@ class Gen1Entry < ApplicationRecord
   has_one :party, dependent: :delete
   has_many :gen1_hall_of_fame_entries, dependent: :delete_all
   has_many :gen1_boxes, dependent: :delete_all
+  belongs_to :user, dependent: :delete
 end
