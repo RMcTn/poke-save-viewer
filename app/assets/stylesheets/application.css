@@ -17,3 +17,76 @@
 .container {
     display: flex;
 }
+
+.type-icon {
+    text-transform: uppercase;
+    border-radius: 5px;
+    border: 1px solid black;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 1px #2E2F30;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: 75px;
+    list-style-type: none;
+}
+
+.type-poison {
+    background-color: darkviolet;
+}
+
+.type-grass {
+    background-color: limegreen;
+}
+
+.type-ghost {
+    background-color: mediumpurple;
+}
+
+.type-flying {
+    background-color: lightskyblue;
+}
+
+.type-normal {
+    background-color: grey;
+}
+
+.type-water {
+    background-color: dodgerblue;
+}
+
+.type-electric {
+    background-color: yellow;
+}
+
+.type-fighting {
+    background-color: maroon;
+}
+
+.type-ground {
+    background-color: sandybrown;
+}
+
+.type-ice {
+    background-color: skyblue;
+}
+
+.type-fire {
+    background-color: orangered;
+}
+
+.type-psychic {
+    background-color: hotpink;
+}
+
+.type-bug {
+    background-color: yellowgreen;
+}
+
+.type-rock {
+    background-color: saddlebrown;
+}
+
+.type-dragon {
+    background-color: rebeccapurple;
+}
