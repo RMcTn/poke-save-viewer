@@ -28,18 +28,24 @@
 </p>
 
 <p>
-  <strong>Party:</strong>
+<details open>
+  <summary><strong>Party:</strong></summary>
   <%= render @gen1_entry.party %>
+</details>
 </p>
 
 <p>
-  <strong>Hall of fame</strong>
+<details open>
+  <summary><strong>Hall of fame</strong></summary>
   <%= render @gen1_entry.gen1_hall_of_fame_entries %>
+</details>
 </p>
 
 <p>
-  <strong>Boxes</strong>
+<details open>
+  <summary><strong>Boxes</strong></summary>
   <%= render @gen1_entry.gen1_boxes %>
+</details>
 </p>
 
 <%= link_to 'Edit', edit_gen1_entry_path(@gen1_entry) %> |

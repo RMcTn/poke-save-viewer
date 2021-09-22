@@ -27,13 +27,17 @@
 </p>
 
 <p>
-  <strong>Party:</strong>
+<details open>
+  <summary><strong>Party:</strong></summary>
   <%= render @gen2_entry.gen2_party %>
+</details>
 </p>
 
 <p>
-  <strong>Hall of fame</strong>
+<details open>
+  <summary><strong>Hall of fame</strong></summary>
   <%= render @gen2_entry.gen2_hall_of_fame_entries %>
+</details>
 </p>
 
 <%= link_to 'Edit', edit_gen2_entry_path(@gen2_entry) %> |
