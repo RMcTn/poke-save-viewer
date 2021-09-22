@@ -16,6 +16,7 @@
 
 .container {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .type-icon {
@@ -89,4 +90,21 @@
 
 .type-dragon {
     background-color: rebeccapurple;
+}
+
+.pokemon-table {
+    text-align: left;
+    border-right: 2px solid lightgray;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.types {
+    display: flex;
+}
+
+.pokemon-sprite {
+}
+
+.pokemon {
 }

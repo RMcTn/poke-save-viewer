@@ -1,8 +1,19 @@
 <div class="pokemon">
   <img class="pokemon-sprite" text-align="center" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= gen2_hall_of_fame_pokemon.pokemon_id %>.png"/>
-  <ul>
-    <li>pokemon id: <%= gen2_hall_of_fame_pokemon.pokemon_id %></li>
-    <li>nickname: <%= gen2_hall_of_fame_pokemon.nickname %></li>
-    <li>level: <%= gen2_hall_of_fame_pokemon.level %></li>
-  </ul>
+  <table class="pokemon-table">
+    <tbody>
+    <tr>
+      <th>Pokedex ID</th>
+      <td><%= gen2_hall_of_fame_pokemon.pokemon_id %></td>
+    </tr>
+    <tr>
+      <th>Nickname</th>
+      <td><%= gen2_hall_of_fame_pokemon.nickname %></td>
+    </tr>
+    <tr>
+      <th>Level</th>
+      <td><%= gen2_hall_of_fame_pokemon.level %></td>
+    </tr>
+    </tbody>
+  </table>
 </div>
