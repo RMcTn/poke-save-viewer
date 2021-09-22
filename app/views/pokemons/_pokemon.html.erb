@@ -1,24 +1,40 @@
 <div class="pokemon">
   <img class="pokemon-sprite" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= pokemon.pokemon_id %>.png"/>
-  <ul>
-    <li>pokemon id: <%= pokemon.pokemon_id %></li>
-    <li>nickname: <%= pokemon.nickname %></li>
-    <% unless pokemon.level.nil? %>
-      <li>level: <%= pokemon.level %></li>
-    <% end %>
+  <table class="pokemon-table">
+    <tbody>
+    <tr>
+      <th>Pokedex ID</th>
+      <td><%= pokemon.pokemon_id %></td>
+    </tr>
+    <tr>
+      <th>Nickname</th>
+      <td><%= pokemon.nickname %></td>
+    </tr>
     <% unless pokemon.max_hp.nil? %>
-      <li>max_hp: <%= pokemon.max_hp %></li>
+      <tr>
+        <th>HP</th>
+        <td><%= pokemon.current_hp %>/<%= pokemon.max_hp %></td>
+      </tr>
     <% end %>
-    <li>current_hp: <%= pokemon.current_hp %></li>
-    <% unless pokemon.max_hp.nil? %>
-      <li><%= pokemon.current_hp %>/<%= pokemon.max_hp %> HP</li>
-    <% end %>
-    <% pokemon_types = { 0 => "Normal", 1 => "Fighting", 2 => "Flying", 3 => "Poison", 4 => "Ground", 5 => "Rock", 7 => "Bug", 8 => "Ghost", 20 => "Fire", 21 => "Water", 22 => "Grass", 23 => "Electric", 24 => "Psychic", 25 => "Ice", 26 => "Dragon" } %>
-    <% first_type = pokemon_types[pokemon.type1] %>
-    <% second_type = pokemon_types[pokemon.type2] %>
-    <li class="type-icon type-<%= first_type.downcase %>"><%= first_type %></li>
-    <% unless first_type == second_type %>
-      <li class="type-icon type-<%= second_type.downcase %>"><%= second_type %></li>
-    <% end %>
-  </ul>
+    <tr>
+      <th>Level</th>
+      <td><%= pokemon.level %></td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <% pokemon_types = { 0 => "Normal", 1 => "Fighting", 2 => "Flying", 3 => "Poison", 4 => "Ground", 5 => "Rock", 7 => "Bug", 8 => "Ghost", 20 => "Fire", 21 => "Water", 22 => "Grass", 23 => "Electric", 24 => "Psychic", 25 => "Ice", 26 => "Dragon", 27 => "Dark", 28 => "Steel" } %>
+      <% first_type = pokemon_types[pokemon.type1] %>
+      <% second_type = pokemon_types[pokemon.type2] %>
+      <td>
+        <div class="types">
+          <span class="type-icon type-<%= first_type.downcase %>"><%= first_type %></span>
+          <% unless first_type == second_type %>
+            <span class="type-icon type-<%= second_type.downcase %>"><%= second_type %></span>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
 </div>
