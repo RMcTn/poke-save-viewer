@@ -66,12 +66,12 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
       post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
     end
     pokemons = [
-      Gen2Pokemon.new(pokemon_id: 73, current_hp: 189, status_condition: 0, type1: 0, type2: 0, move1_id: 57, move2_id: 51, move3_id: 48, move4_id: 196, max_hp: 189, level: 60, nickname: "Mera"),
-      Gen2Pokemon.new(pokemon_id: 93, current_hp: 137, status_condition: 0, type1: 0, type2: 0, move1_id: 95, move2_id: 109, move3_id: 138, move4_id: 171, max_hp: 137, level: 55, nickname: "Johnny"),
-      Gen2Pokemon.new(pokemon_id: 31, current_hp: 205, status_condition: 0, type1: 0, type2: 0, move1_id: 24, move2_id: 70, move3_id: 44, move4_id: 156, max_hp: 205, level: 60, nickname: "Jennifer"),
-      Gen2Pokemon.new(pokemon_id: 169, current_hp: 201, status_condition: 0, type1: 0, type2: 0, move1_id: 19, move2_id: 109, move3_id: 44, move4_id: 216, max_hp: 201, level: 60, nickname: "Bruce"),
-      Gen2Pokemon.new(pokemon_id: 49, current_hp: 174, status_condition: 0, type1: 0, type2: 0, move1_id: 60, move2_id: 127, move3_id: 188, move4_id: 48, max_hp: 174, level: 60, nickname: "Jack"),
-      Gen2Pokemon.new(pokemon_id: 34, current_hp: 181, status_condition: 0, type1: 0, type2: 0, move1_id: 70, move2_id: 247, move3_id: 24, move4_id: 231, max_hp: 181, level: 60, nickname: "Hank"),
+      Gen2Pokemon.new(pokemon_id: 73, current_hp: 189, status_condition: 0, type1: 21, type2: 3, move1_id: 57, move2_id: 51, move3_id: 48, move4_id: 196, max_hp: 189, level: 60, nickname: "Mera"),
+      Gen2Pokemon.new(pokemon_id: 93, current_hp: 137, status_condition: 0, type1: 8, type2: 3, move1_id: 95, move2_id: 109, move3_id: 138, move4_id: 171, max_hp: 137, level: 55, nickname: "Johnny"),
+      Gen2Pokemon.new(pokemon_id: 31, current_hp: 205, status_condition: 0, type1: 3, type2: 4, move1_id: 24, move2_id: 70, move3_id: 44, move4_id: 156, max_hp: 205, level: 60, nickname: "Jennifer"),
+      Gen2Pokemon.new(pokemon_id: 169, current_hp: 201, status_condition: 0, type1: 3, type2: 2, move1_id: 19, move2_id: 109, move3_id: 44, move4_id: 216, max_hp: 201, level: 60, nickname: "Bruce"),
+      Gen2Pokemon.new(pokemon_id: 49, current_hp: 174, status_condition: 0, type1: 7, type2: 3, move1_id: 60, move2_id: 127, move3_id: 188, move4_id: 48, max_hp: 174, level: 60, nickname: "Jack"),
+      Gen2Pokemon.new(pokemon_id: 34, current_hp: 181, status_condition: 0, type1: 3, type2: 4, move1_id: 70, move2_id: 247, move3_id: 24, move4_id: 231, max_hp: 181, level: 60, nickname: "Hank"),
     ]
     party = Gen2Entry.last.gen2_party
 

@@ -13,7 +13,12 @@
     <% unless gen2_pokemon.max_hp.nil? %>
       <li><%= gen2_pokemon.current_hp %>/<%= gen2_pokemon.max_hp %> HP</li>
     <% end %>
-    <li>type1: <%= gen2_pokemon.type1 %></li>
-    <li>type2: <%= gen2_pokemon.type2 %></li>
+    <% pokemon_types = { 0 => "Normal", 1 => "Fighting", 2 => "Flying", 3 => "Poison", 4 => "Ground", 5 => "Rock", 7 => "Bug", 8 => "Ghost", 20 => "Fire", 21 => "Water", 22 => "Grass", 23 => "Electric", 24 => "Psychic", 25 => "Ice", 26 => "Dragon", 27 => "Dark", 28 => "Steel" } %>
+    <% first_type = pokemon_types[gen2_pokemon.type1] %>
+    <% second_type = pokemon_types[gen2_pokemon.type2] %>
+    <li class="type-icon type-<%= first_type.downcase %>"><%= first_type %></li>
+    <% unless first_type == second_type %>
+      <li class="type-icon type-<%= second_type.downcase %>"><%= second_type %></li>
+    <% end %>
   </ul>
 </div>
