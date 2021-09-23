@@ -144,6 +144,6 @@ class Gen2EntriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def gen2_entry_params
-    params.require(:gen2_entry).permit(:save_file, :gen2_game)
+    params.require(:gen2_entry).permit(:save_file)
   end
 end

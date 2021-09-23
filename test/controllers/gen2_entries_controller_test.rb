@@ -17,6 +17,19 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "should require login to view new" do
+    sign_out :user
+    get new_gen2_entry_url
+    assert_response :redirect
+  end
+
+  test "should require login to view entry" do
+    post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
+    sign_out :user
+    get gen2_entry_url(Gen2Entry.last)
+    assert_response :redirect
+  end
+
   test "should get index" do
     get gen2_entries_url
     assert_response :success
@@ -29,21 +42,21 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create gen2_entry" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
 
     assert_redirected_to gen2_entry_url(Gen2Entry.last)
   end
 
   test "should show gen2_entry" do
-    post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+    post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     get gen2_entry_url(Gen2Entry.last)
     assert_response :success
   end
 
   test "should recognise gold game for gen2_entry" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     assert_equal("gold/silver", Gen2Entry.last.game)
     assert_redirected_to gen2_entry_url(Gen2Entry.last)
@@ -51,7 +64,7 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should recognise crystal game for gen2_entry" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_crystal }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_crystal } }
     end
     assert_equal("crystal", Gen2Entry.last.game)
     assert_redirected_to gen2_entry_url(Gen2Entry.last)
@@ -59,7 +72,7 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get translated playername from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     assert_equal("Zest", Gen2Entry.last.player_name)
     assert_redirected_to gen2_entry_url(Gen2Entry.last)
@@ -67,7 +80,7 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get playtime from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     assert_equal(227_743, Gen2Entry.last.playtime)
 
@@ -76,7 +89,7 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get party pokemon from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     pokemons = [
       Gen2Pokemon.new(pokemon_id: 73, current_hp: 186, status_condition: 0, type1: 21, type2: 3, move1_id: 57, move2_id: 51, move3_id: 48, move4_id: 196, max_hp: 186, level: 60, nickname: "Mera", is_shiny: true),
@@ -97,7 +110,7 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get hall of fame entries from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
 
     hall_of_fame_entries = Gen2Entry.last.gen2_hall_of_fame_entries
@@ -131,28 +144,28 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get johto badges from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     assert_equal(["Zephyr", "Plain", "Fog", "Storm", "Mineral", "Glacier", "Rising"], Gen2Entry.last.johto_badges)
   end
 
   test "should get kanto badges from gen2 gold save" do
     assert_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
     end
     assert_equal(["Boulder", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth"], Gen2Entry.last.kanto_badges)
   end
 
   test "should error if file is too big" do
     assert_no_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @large_file }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @large_file } }
     end
 
   end
 
   test "should error if file is too small" do
     assert_no_difference('Gen2Entry.count') do
-      post gen2_entries_url, params: { gen2_entry: { save_file: @small_file }, gen2_game: "gold" }
+      post gen2_entries_url, params: { gen2_entry: { save_file: @small_file } }
     end
 
   end
