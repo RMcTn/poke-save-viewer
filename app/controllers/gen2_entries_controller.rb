@@ -1,4 +1,6 @@
 class Gen2EntriesController < ApplicationController
+  require "active_support"
+  include ActiveSupport::NumberHelper
   before_action :set_gen2_entry, only: %i[ show edit update destroy ]
   before_action :authenticate_user!
 
@@ -27,6 +29,19 @@ class Gen2EntriesController < ApplicationController
     @gen2_entry = Gen2Entry.new(gen2_entry_params)
 
     @gen2_entry.user = current_user
+
+    gen2_save_file_size = 32816
+    if params[:gen2_entry][:save_file].size > gen2_save_file_size
+      @gen2_entry.errors.add :base, :file_too_big, message: "File is too large. Generation 2 save files are #{number_to_human_size(gen2_save_file_size)}"
+      render :new
+      return
+    end
+
+    if params[:gen2_entry][:save_file].size < gen2_save_file_size
+      @gen2_entry.errors.add :base, :file_too_small, message: "File is too small. Generation 2 save files are #{number_to_human_size(gen2_save_file_size)}"
+      render :new
+      return
+    end
 
     uploaded_file = File.binread(params[:gen2_entry][:save_file])
     game = ""

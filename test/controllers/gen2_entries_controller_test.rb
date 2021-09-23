@@ -7,6 +7,8 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:user_no_gen2_entries)
     @save_file_gold = fixture_file_upload("Gold - Poison.sav", "application/octet-stream", true)
     @save_file_crystal = fixture_file_upload("Crystal.sav", "application/octet-stream", true)
+    @large_file = fixture_file_upload("gen2 large.sav", "application/octet-stream", true)
+    @small_file = fixture_file_upload("gen2 small.sav", "application/octet-stream", true)
   end
 
   test "should require login to view index" do
@@ -139,6 +141,20 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
       post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold }, gen2_game: "gold" }
     end
     assert_equal(["Boulder", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth"], Gen2Entry.last.kanto_badges)
+  end
+
+  test "should error if file is too big" do
+    assert_no_difference('Gen2Entry.count') do
+      post gen2_entries_url, params: { gen2_entry: { save_file: @large_file }, gen2_game: "gold" }
+    end
+
+  end
+
+  test "should error if file is too small" do
+    assert_no_difference('Gen2Entry.count') do
+      post gen2_entries_url, params: { gen2_entry: { save_file: @small_file }, gen2_game: "gold" }
+    end
+
   end
 
 end

@@ -7,8 +7,6 @@ class Gen2Entry < ApplicationRecord
   has_many :gen2_hall_of_fame_entries
 
   belongs_to :user, dependent: :delete
-  # TODO Move gen entry controller logic to models, will help with errors
-  #
 
   # NOTE: Types here contain all pokemon (even outside of gen2 and beyond) and possibly fairy type (non existant in gen 2)
   # TODO: Clean up types here
