@@ -26,14 +26,14 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create gen1_entry" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
 
     assert_redirected_to gen1_entry_url(Gen1Entry.last)
   end
 
   test "should show gen1_entry" do
-    post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+    post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     get gen1_entry_url(Gen1Entry.last)
     assert_response :success
   end
@@ -46,7 +46,7 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get translated playername from gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
     assert(Gen1Entry.last.playerName == "Zest")
     assert_redirected_to gen1_entry_url(Gen1Entry.last)
@@ -54,7 +54,7 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get playtime from gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
     assert(Gen1Entry.last.playtime == 223_858)
     assert_redirected_to gen1_entry_url(Gen1Entry.last)
@@ -62,7 +62,7 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get party pokemon from gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
     pokemons = [
       Pokemon.new(pokemon_id: 89, current_hp: 257, status_condition: 0, type1: 3, type2: 3, move1_id: 34, move2_id: 92, move3_id: 104, move4_id: 156, max_hp: 257, level: 77, nickname: "Smoothie"),
@@ -82,7 +82,7 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get hall of fame entries from gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
 
     hall_of_fame_entries = Gen1Entry.last.gen1_hall_of_fame_entries
@@ -115,14 +115,14 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get kanto badges from gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
     assert_equal(["Boulder", "Thunder", "Rainbow", "Soul", "Marsh", "Volcano", "Earth"], Gen1Entry.last.badges)
   end
 
   test "should get pokemon from currently selected box gen1 save" do
     assert_difference('Gen1Entry.count') do
-      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red" }
+      post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
     end
     # We only get the current selected box right now
     current_box_pokemon = Gen1Entry.last.gen1_boxes.first.pokemons

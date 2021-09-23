@@ -30,6 +30,8 @@ class Gen2EntriesController < ApplicationController
 
     @gen2_entry.user = current_user
 
+    # TODO Graphics for badges
+
     gen2_save_file_size = 32816
     if params[:gen2_entry][:save_file].size > gen2_save_file_size
       @gen2_entry.errors.add :base, :file_too_big, message: "File is too large. Generation 2 save files are #{number_to_human_size(gen2_save_file_size)}"

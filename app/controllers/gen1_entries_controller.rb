@@ -172,6 +172,9 @@ class Gen1EntriesController < ApplicationController
     @gen1_entry = Gen1Entry.new(gen1_entry_params)
     @gen1_entry.user = current_user
 
+    # TODO: move functions to model like gen2
+    # TODO: Filesize validation
+
     # TODO: Populate the mapping only once
     @mappings = Hash.new
     File.readlines("gen1_english_mappings.txt").each do |line|
