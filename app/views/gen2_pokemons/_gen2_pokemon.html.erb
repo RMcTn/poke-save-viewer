@@ -1,5 +1,5 @@
 <div class="pokemon">
-  <img class="pokemon-sprite" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= gen2_pokemon.pokemon_id %>.png"/>
+  <img class="pokemon-sprite" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/<%= "shiny/" if gen2_pokemon.is_shiny? %><%= gen2_pokemon.pokemon_id %>.png"/>
   <table class="pokemon-table">
     <tbody>
     <tr>
