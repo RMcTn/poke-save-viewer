@@ -1,6 +1,7 @@
 class Gen1EntriesController < ApplicationController
   before_action :set_gen1_entry, only: %i[ show edit update destroy ]
   before_action :authenticate_user!
+  before_action :is_user_authorized?, except: [:index, :create, :new]
 
   PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
 
@@ -273,5 +274,9 @@ class Gen1EntriesController < ApplicationController
   # Only allow a list of trusted parameters through.
   def gen1_entry_params
     params.require(:gen1_entry).permit(:saveFile, :gen1_game)
+  end
+
+  def is_user_authorized?
+    render file: "#{Rails.root}/public/404.html" , status: 404 if current_user != @gen1_entry.user
   end
 end

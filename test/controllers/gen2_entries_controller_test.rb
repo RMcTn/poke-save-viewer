@@ -30,6 +30,22 @@ class Gen2EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "user A should not be able to view user B's entries" do
+    post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
+    sign_out :user
+    sign_in users(:user_no_gen2_entries2)
+    get gen2_entry_url(Gen2Entry.last)
+    assert_response :missing
+  end
+
+  test "user A should not be able to edit user B's entries" do
+    post gen2_entries_url, params: { gen2_entry: { save_file: @save_file_gold } }
+    sign_out :user
+    sign_in users(:user_no_gen2_entries2)
+    get edit_gen2_entry_url(Gen2Entry.last)
+    assert_response :missing
+  end
+
   test "should get index" do
     get gen2_entries_url
     assert_response :success

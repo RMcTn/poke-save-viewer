@@ -4,6 +4,8 @@ class Gen2EntriesController < ApplicationController
   before_action :set_gen2_entry, only: %i[ show edit update destroy ]
   before_action :authenticate_user!
 
+  before_action :is_user_authorized?, except: [:index, :create, :new]
+
   @@max_pokemon_in_party = 6
 
   # GET /gen2_entries or /gen2_entries.json
@@ -147,5 +149,9 @@ class Gen2EntriesController < ApplicationController
   # Only allow a list of trusted parameters through.
   def gen2_entry_params
     params.require(:gen2_entry).permit(:save_file)
+  end
+
+  def is_user_authorized?
+    render file: "#{Rails.root}/public/404.html" , status: 404 if current_user != @gen2_entry.user
   end
 end

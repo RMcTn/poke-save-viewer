@@ -1,6 +1,7 @@
 class Pokemon < ApplicationRecord
   belongs_to :party, optional: true
   belongs_to :gen1_box, optional: true
+  delegate :gen1_entry, :to => :party
 
   def same_as_pokemon?(other_pokemon)
     self.attributes.except("id", "party_id", "created_at", "updated_at", "gen1_box_id") ==
