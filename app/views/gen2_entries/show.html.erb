@@ -1,4 +1,8 @@
 <p id="notice"><%= notice %></p>
+<%= link_to 'Sign out', destroy_user_session_path, :method => :delete %>
+<br>
+<%= "owner: " + @gen2_entry.user.email %> <br>
+<%= "current user: " + current_user.email %>
 
 <p>
   <strong>Game:</strong>

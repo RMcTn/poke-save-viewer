@@ -14,6 +14,14 @@ class Gen1EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "user A should not be able to view user B's entries" do
+    post gen1_entries_url, params: { gen1_entry: { saveFile: @save_file_red }, gen1_game: "red/blue" }
+    sign_out :user
+    sign_in users(:user_no_gen1_entries2)
+    get gen1_entry_url(Gen1Entry.last)
+    assert_response :missing
+  end
+
   test "should get index" do
     get gen1_entries_url
     assert_response :success
