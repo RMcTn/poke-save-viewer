@@ -2,11 +2,11 @@ class Gen2Entry < ApplicationRecord
   validates :game, inclusion: { in: %w[gold/silver crystal], message: "Save file is not a valid Gold/Silver or Crystal save file" }
   # TODO Validate save_file size
   has_one_attached :save_file
-  has_one :gen2_party
+  has_one :gen2_party, dependent: :destroy
   # TODO: Look into polymorhpic relations in rails, might solve the duplicating of pokemon/parties between gen1/2
-  has_many :gen2_hall_of_fame_entries
+  has_many :gen2_hall_of_fame_entries, dependent: :destroy
 
-  belongs_to :user, dependent: :delete
+  belongs_to :user
 
   # NOTE: Types here contain all pokemon (even outside of gen2 and beyond) and possibly fairy type (non existant in gen 2)
   # TODO: Clean up types here
