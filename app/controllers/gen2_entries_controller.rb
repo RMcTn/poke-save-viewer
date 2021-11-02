@@ -63,6 +63,19 @@ class Gen2EntriesController < ApplicationController
       return
     end
 
+    num_pokemon_in_party = @gen2_entry.get_number_of_pokemon_in_party(uploaded_file.bytes)
+    if num_pokemon_in_party > @@max_pokemon_in_party
+      @gen2_entry.errors.add :base, :too_many_pokemon, message: "Too many pokemon in party. Is this file a valid Gold/Silver or Crystal save file?"
+      render :new
+      return
+    end
+
+    if num_pokemon_in_party == 0 
+      @gen2_entry.errors.add :base, :not_enough_pokemon, message: "Not enough pokemon in party. Is this file a valid Gold/Silver or Crystal save file?"
+      render :new
+      return
+    end
+
     # TODO: Populate the mapping only once
     @character_mapping = Hash.new
     File.readlines("gen1_english_mappings.txt").each do |line|
@@ -86,6 +99,10 @@ class Gen2EntriesController < ApplicationController
     @gen2_entry.kanto_badges = kanto_badges
 
     if party_pokemon.size > @@max_pokemon_in_party
+      # TODO: Is this needed now that we check for number of pokemon in party before processing?
+      @gen2_entry.errors.add :base, :too_many_pokemon, message: "Too many pokemon in party. Is this file a valid Gold/Silver or Crystal save file?"
+      render :new
+      return
       @gen2_entry.errors.add :base, :too_many_pokemon, message: "Too many pokemon in party. Is this file a valid Gold/Silver or Crystal save file?"
       render :new
       return

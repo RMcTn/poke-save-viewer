@@ -60,6 +60,14 @@ class Gen2Entry < ApplicationRecord
     (playtime_hours * 60 * 60) + (playtime_minutes * 60) + playtime_seconds
   end
 
+  def get_number_of_pokemon_in_party(uploaded_file)
+    party_offset = 0x288A
+    if game == "crystal"
+      party_offset = 0x2865
+    end
+    return uploaded_file[party_offset].to_i
+  end
+
   def get_player_party(uploaded_file, character_mapping)
     # See https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_data_structure_(Generation_II) for offsets
     party_pokemon = []
@@ -191,5 +199,6 @@ class Gen2Entry < ApplicationRecord
     end
     hall_of_fame_entries
   end
+
 
 end

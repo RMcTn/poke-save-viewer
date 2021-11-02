@@ -1,9 +1,13 @@
 class Gen1EntriesController < ApplicationController
+  require "active_support"
+  include ActiveSupport::NumberHelper
   before_action :set_gen1_entry, only: %i[ show edit update destroy ]
   before_action :authenticate_user!
   before_action :is_user_authorized?, except: [:index, :create, :new]
 
   PokemonStruct = Struct.new(:pokemon_id, :current_hp, :status_condition, :type1_id, :type2_id, :move1_id, :move2_id, :move3_id, :move4_id, :max_hp, :level, :nickname, keyword_init: true)
+
+  @@max_pokemon_in_party = 6
 
   def translate_game_string(game_str, character_mapping)
     translated_string = ""
@@ -22,6 +26,11 @@ class Gen1EntriesController < ApplicationController
     player_name_max_size = 0xB
     save_file[player_name_offset..(player_name_offset + player_name_max_size)].bytes
   end
+
+ def get_number_of_pokemon_in_party(save_file)
+    party_offset = 0x2F2C
+    return save_file[party_offset].to_i
+ end
 
   def get_pokemon_from_save(save_file, pokemon_offset, nickname_offset, is_party_pokemon)
     pokemon_index = save_file[pokemon_offset]
@@ -173,15 +182,18 @@ class Gen1EntriesController < ApplicationController
     @gen1_entry = Gen1Entry.new(gen1_entry_params)
     @gen1_entry.user = current_user
 
-    # TODO: move functions to model like gen2
-    # TODO: Filesize validation
+    gen1_save_file_size = 32768
 
-    # TODO: Populate the mapping only once
-    @mappings = Hash.new
-    File.readlines("gen1_english_mappings.txt").each do |line|
-      splits = line.split(' ')
-      poke_char = splits[1].to_i(16)
-      @mappings[poke_char] = splits[0]
+    if params[:gen1_entry][:saveFile].size > gen1_save_file_size
+      @gen1_entry.errors.add :base, :file_too_big, message: "File is too large. Generation 1 save files are #{number_to_human_size(gen1_save_file_size)}"
+      render :new
+      return
+    end
+
+    if params[:gen1_entry][:saveFile].size < gen1_save_file_size
+      @gen1_entry.errors.add :base, :file_too_small, message: "File is too small. Generation 1 save files are #{number_to_human_size(gen1_save_file_size)}"
+      render :new
+      return
     end
 
     selected_game = params[:gen1_game]
@@ -192,6 +204,31 @@ class Gen1EntriesController < ApplicationController
     end
 
     uploaded_file = File.binread(params[:gen1_entry][:saveFile])
+
+    num_pokemon_in_party = get_number_of_pokemon_in_party(uploaded_file.bytes)
+    if num_pokemon_in_party > @@max_pokemon_in_party
+      @gen1_entry.errors.add :base, :too_many_pokemon, message: "Too many pokemon in party. Is this file a valid Red/Blue or Yellow save file?"
+      render :new
+      return
+    end
+
+    if num_pokemon_in_party == 0 
+      @gen1_entry.errors.add :base, :not_enough_pokemon, message: "Not enough pokemon in party. Is this file a valid Red/Blue or Yellow save file?"
+      render :new
+      return
+    end
+
+    # TODO: move functions to model like gen2
+
+    # TODO: Populate the mapping only once
+    @mappings = Hash.new
+    File.readlines("gen1_english_mappings.txt").each do |line|
+      splits = line.split(' ')
+      poke_char = splits[1].to_i(16)
+      @mappings[poke_char] = splits[0]
+    end
+
+
     player_name = translate_game_string(get_player_name(uploaded_file), @mappings)
     @gen1_entry.playerName = player_name
 
