@@ -10,7 +10,7 @@ class Gen2EntriesController < ApplicationController
 
   # GET /gen2_entries or /gen2_entries.json
   def index
-    @gen2_entries = Gen2Entry.all
+    @gen2_entries = current_user.gen2_entries
   end
 
   # GET /gen2_entries/1 or /gen2_entries/1.json

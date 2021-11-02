@@ -151,7 +151,7 @@ class Gen1EntriesController < ApplicationController
 
   # GET /gen1_entries or /gen1_entries.json
   def index
-    @gen1_entries = Gen1Entry.all
+    @gen1_entries = current_user.gen1_entries
   end
 
   # GET /gen1_entries/1 or /gen1_entries/1.json

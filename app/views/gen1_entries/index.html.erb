@@ -12,7 +12,7 @@
   </thead>
 
   <tbody>
-  <% current_user.gen1_entries.each do |gen1_entry| %>
+  <% @gen1_entries.each do |gen1_entry| %>
     <tr>
       <td><%= gen1_entry.playerName %></td>
       <td><%= gen1_entry.game.titleize %></td>
